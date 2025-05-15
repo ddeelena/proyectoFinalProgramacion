@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,25 +23,26 @@ public class UsuarioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UsuarioDTO>> findAll() {
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> findById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isOwner(#id)")
+    public ResponseEntity<UsuarioDTO> findById(@PathVariable String id) {
         return usuarioService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isEmailOwner(#email)")
     public ResponseEntity<UsuarioDTO> findByEmail(@PathVariable String email) {
         return usuarioService.findByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // Continuación de UsuarioController.java
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> save(@Valid @RequestBody UsuarioDTO usuarioDTO) {
@@ -57,7 +59,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> update(@PathVariable Long id, @Valid @RequestBody UsuarioDTO usuarioDTO) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isOwner(#id)")
+    public ResponseEntity<UsuarioDTO> update(@PathVariable String id, @Valid @RequestBody UsuarioDTO usuarioDTO) {
         try {
             UsuarioDTO updated = usuarioService.update(id, usuarioDTO);
             return ResponseEntity.ok(updated);
@@ -67,7 +70,8 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteById(@PathVariable String id) {
         try {
             usuarioService.deleteById(id);
             return ResponseEntity.noContent().build();

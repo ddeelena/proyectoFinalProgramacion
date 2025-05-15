@@ -2,14 +2,12 @@ package com.veterinaria.usuarios.service.impl;
 
 import com.veterinaria.usuarios.dto.MascotaDTO;
 import com.veterinaria.usuarios.model.Mascota;
-import com.veterinaria.usuarios.model.Usuario;
+import com.veterinaria.usuarios.model.Propietario;
 import com.veterinaria.usuarios.repository.MascotaRepository;
 import com.veterinaria.usuarios.repository.UsuarioRepository;
 import com.veterinaria.usuarios.service.MascotaService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +26,6 @@ public class MascotaServiceImpl implements MascotaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<MascotaDTO> findAll() {
         return mascotaRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -36,36 +33,42 @@ public class MascotaServiceImpl implements MascotaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<MascotaDTO> findById(Long id) {
+    public Optional<MascotaDTO> findById(String id) {
         return mascotaRepository.findById(id)
                 .map(this::convertToDTO);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<MascotaDTO> findByPropietarioId(Long propietarioId) {
-        Usuario propietario = usuarioRepository.findById(propietarioId)
-                .orElseThrow(() -> new EntityNotFoundException("Propietario no encontrado con ID: " + propietarioId));
+    public List<MascotaDTO> findByPropietarioId(String propietarioId) {
+        if (!usuarioRepository.existsById(propietarioId)) {
+            throw new RuntimeException("Propietario no encontrado con ID: " + propietarioId);
+        }
 
-        return mascotaRepository.findByPropietario(propietario).stream()
+        return mascotaRepository.findByPropietarioId(propietarioId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
     public MascotaDTO save(MascotaDTO mascotaDTO) {
+        String propietarioId = mascotaDTO.getPropietarioId();
+        Propietario propietario = usuarioRepository.findById(propietarioId)
+                .orElseThrow(() -> new RuntimeException("Propietario no encontrado con ID: " + propietarioId));
+
         Mascota mascota = convertToEntity(mascotaDTO);
         mascota = mascotaRepository.save(mascota);
+
+        // Actualizar la relación en el usuario
+        propietario.addMascota(mascota);
+        usuarioRepository.save(propietario);
+
         return convertToDTO(mascota);
     }
 
     @Override
-    @Transactional
-    public MascotaDTO update(Long id, MascotaDTO mascotaDTO) {
+    public MascotaDTO update(String id, MascotaDTO mascotaDTO) {
         if (!mascotaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mascota no encontrada con ID: " + id);
+            throw new RuntimeException("Mascota no encontrada con ID: " + id);
         }
 
         Mascota mascota = convertToEntity(mascotaDTO);
@@ -75,11 +78,22 @@ public class MascotaServiceImpl implements MascotaService {
     }
 
     @Override
-    @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         if (!mascotaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mascota no encontrada con ID: " + id);
+            throw new RuntimeException("Mascota no encontrada con ID: " + id);
         }
+
+        // Recuperar la mascota y el propietario para actualizar la relación
+        Mascota mascota = mascotaRepository.findById(id).orElseThrow();
+        String propietarioId = mascota.getPropietarioId();
+
+        Optional<Propietario> propietarioOpt = usuarioRepository.findById(propietarioId);
+        if (propietarioOpt.isPresent()) {
+            Propietario propietario = propietarioOpt.get();
+            propietario.removeMascota(mascota);
+            usuarioRepository.save(propietario);
+        }
+
         mascotaRepository.deleteById(id);
     }
 
@@ -92,7 +106,7 @@ public class MascotaServiceImpl implements MascotaService {
         mascotaDTO.setEdad(mascota.getEdad());
         mascotaDTO.setPeso(mascota.getPeso());
         mascotaDTO.setObservaciones(mascota.getObservaciones());
-        mascotaDTO.setPropietarioId(mascota.getPropietario().getId());
+        mascotaDTO.setPropietarioId(mascota.getPropietarioId());
         return mascotaDTO;
     }
 
@@ -105,10 +119,7 @@ public class MascotaServiceImpl implements MascotaService {
         mascota.setEdad(mascotaDTO.getEdad());
         mascota.setPeso(mascotaDTO.getPeso());
         mascota.setObservaciones(mascotaDTO.getObservaciones());
-
-        Usuario propietario = usuarioRepository.findById(mascotaDTO.getPropietarioId())
-                .orElseThrow(() -> new EntityNotFoundException("Propietario no encontrado con ID: " + mascotaDTO.getPropietarioId()));
-        mascota.setPropietario(propietario);
+        mascota.setPropietarioId(mascotaDTO.getPropietarioId());
 
         return mascota;
     }

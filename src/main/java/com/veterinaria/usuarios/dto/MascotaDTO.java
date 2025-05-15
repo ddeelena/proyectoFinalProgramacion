@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class MascotaDTO {
-    private Long id;
+    private String id;
 
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
@@ -28,5 +28,5 @@ public class MascotaDTO {
     private String observaciones;
 
     @NotNull(message = "El ID del propietario es obligatorio")
-    private Long propietarioId;
+    private String propietarioId;
 }

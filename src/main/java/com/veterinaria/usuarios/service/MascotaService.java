@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface MascotaService {
     List<MascotaDTO> findAll();
-    Optional<MascotaDTO> findById(Long id);
-    List<MascotaDTO> findByPropietarioId(Long propietarioId);
+    Optional<MascotaDTO> findById(String id);
+    List<MascotaDTO> findByPropietarioId(String propietarioId);
     MascotaDTO save(MascotaDTO mascotaDTO);
-    MascotaDTO update(Long id, MascotaDTO mascotaDTO);
-    void deleteById(Long id);
+    MascotaDTO update(String id, MascotaDTO mascotaDTO);
+    void deleteById(String id);
 }

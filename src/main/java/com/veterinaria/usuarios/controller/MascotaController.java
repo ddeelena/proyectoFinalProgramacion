@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,23 +23,27 @@ public class MascotaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<MascotaDTO>> findAll() {
         return ResponseEntity.ok(mascotaService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MascotaDTO> findById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isMascotaOwner(#id)")
+    public ResponseEntity<MascotaDTO> findById(@PathVariable String id) {
         return mascotaService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/propietario/{propietarioId}")
-    public ResponseEntity<List<MascotaDTO>> findByPropietarioId(@PathVariable Long propietarioId) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isOwner(#propietarioId)")
+    public ResponseEntity<List<MascotaDTO>> findByPropietarioId(@PathVariable String propietarioId) {
         return ResponseEntity.ok(mascotaService.findByPropietarioId(propietarioId));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isOwner(#mascotaDTO.propietarioId)")
     public ResponseEntity<MascotaDTO> save(@Valid @RequestBody MascotaDTO mascotaDTO) {
         if (mascotaDTO.getId() != null) {
             return ResponseEntity.badRequest().build();
@@ -53,7 +58,8 @@ public class MascotaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MascotaDTO> update(@PathVariable Long id, @Valid @RequestBody MascotaDTO mascotaDTO) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isMascotaOwner(#id)")
+    public ResponseEntity<MascotaDTO> update(@PathVariable String id, @Valid @RequestBody MascotaDTO mascotaDTO) {
         try {
             MascotaDTO updated = mascotaService.update(id, mascotaDTO);
             return ResponseEntity.ok(updated);
@@ -63,7 +69,8 @@ public class MascotaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isMascotaOwner(#id)")
+    public ResponseEntity<Void> deleteById(@PathVariable String id) {
         try {
             mascotaService.deleteById(id);
             return ResponseEntity.noContent().build();

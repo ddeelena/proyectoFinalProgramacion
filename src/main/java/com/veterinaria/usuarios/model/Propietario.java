@@ -1,6 +1,8 @@
 package com.veterinaria.usuarios.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,16 +13,14 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "usuarios")
+@Document(collection = "usuarios")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
+public class Propietario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
@@ -30,7 +30,6 @@ public class Usuario {
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "El formato del email no es válido")
-    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "El teléfono es obligatorio")
@@ -39,6 +38,15 @@ public class Usuario {
 
     private String direccion;
 
-    @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @DBRef
     private List<Mascota> mascotas = new ArrayList<>();
+
+    // Métodos helper
+    public void addMascota(Mascota mascota) {
+        mascotas.add(mascota);
+    }
+
+    public void removeMascota(Mascota mascota) {
+        mascotas.remove(mascota);
+    }
 }
