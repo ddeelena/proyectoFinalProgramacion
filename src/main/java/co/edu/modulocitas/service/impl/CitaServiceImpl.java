@@ -38,9 +38,7 @@ public class CitaServiceImpl implements CitaService {
                     existingCita.setHora( cita.getHora());
                     existingCita.setEstado(cita.getEstado());
                     existingCita.setEs_urgencia(cita.isEs_urgencia());
-                    existingCita.setMotivo(cita.getMotivo());
                     existingCita.setIdPaciente(cita.getIdPaciente());
-                    existingCita.setIdDueño(cita.getIdDueño());
                     return citaRepository.save(existingCita);
                 });
     }

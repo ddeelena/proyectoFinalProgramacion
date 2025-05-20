@@ -37,8 +37,6 @@ public class ConsultaServiceImpl implements ConsultaService {
         return consultaRepository.findById(consulta.getId())
                 .map(existingConsulta -> {
                     existingConsulta.setMotivoConsulta(consulta.getMotivoConsulta());
-                    existingConsulta.setFecha(consulta.getFecha());
-                    existingConsulta.setHora(consulta.getHora());
                     existingConsulta.setMotivoConsulta(consulta.getMotivoConsulta());
                     existingConsulta.setDiagnostico(consulta.getDiagnostico());
                     return consultaRepository.save(existingConsulta);
