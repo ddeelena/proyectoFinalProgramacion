@@ -1,12 +1,11 @@
 package co.edu.modulocitas.controller;
 
+import co.edu.modulocitas.enums.Estado;
 import co.edu.modulocitas.model.Cita;
 import co.edu.modulocitas.service.AgendaService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
 @RestController
@@ -16,22 +15,25 @@ public class AgendaController {
 
     private final AgendaService agendaService;
 
-    @RequestMapping("/cita")
-    @GetMapping("/{id}")
-    public Optional<Cita> consultarCita(Integer idCita) {
-        return agendaService.consultarCita(idCita);
+    @GetMapping("/cita/{idCita}")
+    public Optional<Cita> consultarCita(@PathVariable Integer idCita) {
+        return agendaService.consultarCitaPorId(idCita);
     }
 
     @PostMapping("/crear")
-    public Cita crearCita(Cita cita) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cita crearCita(@RequestBody Cita cita) {
         return agendaService.crearCita(cita);
     }
 
-    @RequestMapping("/actualizar")
-    @PutMapping("/{id}")
-    public Optional<Cita> actualizarCita(int id, Cita cita) {
-        return agendaService.actualizarCita(id, cita);
+    @PutMapping("/actualizar/{idCita}")
+    public Optional<Cita> actualizarCita(@PathVariable int idCita, @RequestBody Cita cita) {
+        return agendaService.actualizarCita(idCita, cita);
     }
 
-
+    @PutMapping("/estado/{idCita}")
+    public Optional<Cita> cambiarEstado(@PathVariable int idCita, @RequestParam Estado estado) {
+        return agendaService.cambiarEstado(idCita, estado);
+    }
 }
+

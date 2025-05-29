@@ -13,15 +13,17 @@ public class Cita {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idCita;
 
     private Integer idPaciente;
     private Integer idVeterinario;
     private LocalDate fecha;
     private Time hora;
-    private boolean es_urgencia;
-    private Estado estado;
+    private boolean esUrgencia;
     private String motivo;
+
+    @Enumerated(EnumType.STRING)
+    private Estado estado;
 
     @ManyToOne
     @JoinColumn(name = "servicio_id")
