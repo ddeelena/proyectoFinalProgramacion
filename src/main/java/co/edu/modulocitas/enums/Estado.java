@@ -4,5 +4,6 @@ public enum Estado {
     PROGRAMADA,
     ATENDIDA,
     CANCELADA,
-    REPROGRAMADA
+    REPROGRAMADA,
+    EN_CURSO
 }

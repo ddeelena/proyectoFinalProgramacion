@@ -6,6 +6,8 @@ import co.edu.modulocitas.service.AgendaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -35,5 +37,10 @@ public class AgendaController {
     public Optional<Cita> cambiarEstado(@PathVariable int idCita, @RequestParam Estado estado) {
         return agendaService.cambiarEstado(idCita, estado);
     }
-}
 
+    @GetMapping
+    public List<Cita> consultarTodasLasCitas() {
+        return  agendaService.consultarCitas();
+    }
+
+}

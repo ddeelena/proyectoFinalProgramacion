@@ -2,6 +2,7 @@ package co.edu.modulocitas.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.Duration;
 
 
 @Data
@@ -15,7 +16,7 @@ public class Servicio {
 
     private String tipo;
     private String descripcion;
-    private Integer duracion;
+    private Duration duracion;
     private String requisitos;
 
 
