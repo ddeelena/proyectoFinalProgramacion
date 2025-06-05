@@ -83,7 +83,7 @@ public class AgendaServiceImpl implements AgendaService {
 
     @Override
     public List<Cita> consultarCitaPorHora(Time hora) {
-        return citaRepository.findCitaByHora(hora);
+        return List.of();
     }
 
     @Override

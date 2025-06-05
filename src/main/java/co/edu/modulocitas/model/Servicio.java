@@ -9,7 +9,6 @@ import java.time.Duration;
 @Entity
 @Table(name = "servicios")
 public class Servicio {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -18,6 +17,5 @@ public class Servicio {
     private String descripcion;
     private Duration duracion;
     private String requisitos;
-
 
 }

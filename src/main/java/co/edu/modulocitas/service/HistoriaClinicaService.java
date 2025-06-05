@@ -1,6 +1,5 @@
 package co.edu.modulocitas.service;
 
-import co.edu.modulocitas.model.Cita;
 import co.edu.modulocitas.model.HistoriaClinica;
 import org.springframework.stereotype.Service;
 

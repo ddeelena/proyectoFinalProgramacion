@@ -1,7 +1,5 @@
 package co.edu.modulocitas.controller;
 
-
-import co.edu.modulocitas.model.Cita;
 import co.edu.modulocitas.model.HistoriaClinica;
 import co.edu.modulocitas.service.HistoriaClinicaService;
 import lombok.RequiredArgsConstructor;
